@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
 import enum
 import uuid
-
+from sqlalchemy.dialects.postgresql import UUID
 
 Base = declarative_base()
 
@@ -23,12 +23,18 @@ class AssetStatus(str, enum.Enum):
     archived = "archived"
 
 
+class AssetSource(str, enum.Enum):
+    Import = "import"
+    manual = "manual"
+    scan = "scan"
+
+
 class AssetRelationship(Base):
     __tablename__ = "asset_relationships"
 
-    id = Column( String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    source_asset_id = Column( String, ForeignKey("assets.id"), nullable=False)
-    target_asset_id = Column( String, ForeignKey("assets.id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    source_asset_id = Column( UUID(as_uuid=True), ForeignKey("assets.id"), nullable=False)
+    target_asset_id = Column( UUID(as_uuid=True), ForeignKey("assets.id"), nullable=False)
     relationship_type = Column( String, nullable=False)
     source_asset = relationship(
         "Asset", foreign_keys=[source_asset_id], back_populates="outgoing_relationships"
@@ -41,13 +47,13 @@ class AssetRelationship(Base):
 class Asset(Base):
     __tablename__ = "assets"
 
-    id = Column(String, primary_key=True, default=lambda:str(uuid.uuid4()))
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     type = Column(Enum(AssetType), nullable=False)
     value = Column(String, nullable=False)
     status = Column(Enum(AssetStatus), nullable=False)
     first_seen = Column(DateTime,default=datetime.utcnow, nullable=False)
     last_seen = Column(DateTime, default=datetime.utcnow, nullable=False)
-    source = Column(String)
+    source = Column(Enum(AssetSource), nullable=False)
     tags = Column(JSON, default=list)
     metadata_json = Column(JSON, default=dict)
     outgoing_relationships = relationship(

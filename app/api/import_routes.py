@@ -15,6 +15,6 @@ def get_db():
 
 
 @router.post("/import", response_model= AssetResponse)
-def import_assets(asset: AssetImport, db:Session=Depends(get_db)):
+async def import_assets(asset: AssetImport, db:Session=Depends(get_db)):
     results = import_asset(db, asset)
     return results

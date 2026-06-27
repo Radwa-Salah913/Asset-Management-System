@@ -1,23 +1,27 @@
 from pydantic import BaseModel
 from typing import List, Dict, Any
-from app.database.models import AssetType, AssetStatus
+from app.database.models import AssetType, AssetStatus, AssetSource
+from datetime import datetime
+from uuid import UUID
 
 class AssetImport(BaseModel):
-    id: str
+    
     type: AssetType
     value: str
     status: AssetStatus
-    source: str
+    source: AssetSource
     tags: List[str] = []
     metadata: Dict[str, Any] = {}
 
 
 class AssetResponse(BaseModel):
-    id: str
+    id: UUID
     type: AssetType
     value: str
+    first_seen: datetime
+    last_seen: datetime
     status: AssetStatus
-    source: str
+    source: AssetSource
     tags: List[str]
     metadata_json: Dict[str, Any]
 

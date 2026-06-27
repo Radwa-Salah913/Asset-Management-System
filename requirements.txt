@@ -3,3 +3,6 @@ uvicorn==0.49.0
 sqlalchemy==2.0.51
 python-dotenv==1.2.2
 psycopg2-binary
+langchain-google-genai==4.2.6
+langchain-core==1.4.8
+pandas
