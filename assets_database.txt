@@ -1,0 +1,484 @@
+basic Asset database:
+-----------------------------------------------------------------------------
+{
+
+  "type": "domain",
+  "value": "example.com",
+  "status": "active",
+  "source": "import",
+  "tags": ["production", "external"],
+  "metadata": {
+    "registrar": "Cloudflare",
+    "dns_provider": "Cloudflare"
+  }
+}
+{
+  
+  "type": "subdomain",
+  "value": "api.example.com",
+  "status": "active",
+  "source": "scan",
+  "tags": ["api", "production"],
+  "metadata": {
+    "parent_domain": "example.com",
+    "resolved_ip": "203.0.113.15"
+  }
+}
+
+
+{
+  
+  "type": "subdomain",
+  "value": "old-api.example.com",
+  "status": "stale",
+  "source": "scan",
+  "tags": ["legacy"],
+  "metadata": {
+    "parent_domain": "example.com"
+  }
+}
+
+{
+
+  "type": "ip_address",
+  "value": "203.0.113.15",
+  "status": "active",
+  "source": "scan",
+  "tags": ["cloud"],
+  "metadata": {
+    "provider": "AWS",
+    "country": "US"
+  }
+}
+
+
+{
+
+  "type": "service",
+  "value": "443/tcp",
+  "status": "active",
+  "source": "scan",
+  "tags": ["https"],
+  "metadata": {
+    "host": "api.example.com",
+    "protocol": "HTTPS",
+    "banner": "nginx/1.24.0"
+  }
+}
+
+{
+  "type": "service",
+  "value": "22/tcp",
+  "status": "active",
+  "source": "scan",
+  "tags": ["ssh"],
+  "metadata": {
+    "host": "203.0.113.15",
+    "banner": "OpenSSH_9.3"
+  }
+}
+
+{
+  
+  "type": "certificate",
+  "value": "CN=api.example.com",
+  "status": "active",
+  "source": "scan",
+  "tags": ["tls"],
+  "metadata": {
+    "issuer": "Let's Encrypt",
+    "expires": "2026-09-20T00:00:00Z",
+    "serial_number": "03A8F4..."
+  }
+}
+
+{
+  "type": "certificate",
+  "value": "CN=legacy.example.com",
+  "status": "stale",
+  "source": "scan",
+  "tags": ["expired"],
+  "metadata": {
+    "issuer": "Let's Encrypt",
+    "expires": "2026-05-10T00:00:00Z"
+  }
+}
+
+
+{
+  "type": "technology",
+  "value": "nginx",
+  "status": "active",
+  "source": "scan",
+  "tags": ["webserver"],
+  "metadata": {
+    "version": "1.24.0",
+    "host": "api.example.com"
+  }
+}
+
+{
+  "type": "technology",
+  "value": "React",
+  "status": "active",
+  "source": "scan",
+  "tags": ["frontend"],
+  "metadata": {
+    "version": "18.3.0",
+    "framework": true
+  }
+}
+
+{
+  "type": "domain",
+  "value": "partner-company.com",
+  "status": "active",
+  "source": "manual",
+  "tags": ["partner"],
+  "metadata": {
+    "owner": "Security Team"
+  }
+}
+
+
+{
+  "type": "domain",
+  "value": "old-company.com",
+  "status": "archived",
+  "source": "import",
+  "tags": ["legacy"],
+  "metadata": {
+    "reason": "Company merger"
+  }
+}
+---------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+test importer:
+------------------
+input:
+[
+  {
+    "type": "domain",
+    "value": "example.com",
+    "status": "active",
+    "source": "import",
+    "tags": ["production"],
+    "metadata": {
+      "registrar": "Cloudflare"
+    }
+  },
+  {
+    "type": "domain",
+    "value": "example.com",
+    "status": "active",
+    "source": "scan",
+    "tags": ["critical"],
+    "metadata": {
+      "dns_provider": "Cloudflare"
+    }
+  },
+  {
+    "type": "ip_address",
+    "value": "192.168.1.10",
+    "status": "active",
+    "source": "scan",
+    "tags": ["internal"],
+    "metadata": {
+      "hostname": "server01"
+    }
+  },
+  {
+    "type": "service",
+    "value": "443/tcp",
+    "status": "active",
+    "source": "scan",
+    "tags": ["https"],
+    "metadata": {
+      "port": 443,
+      "protocol": "HTTPS"
+    }
+  },
+  {
+    "type": "technology",
+    "value": "React",
+    "status": "active",
+    "source": "manual",
+    "tags": ["frontend"],
+    "metadata": {
+      "version": "19"
+    }
+  },
+
+  {
+    "type": "database",
+    "value": "mysql",
+    "status": "active",
+    "source": "scan",
+    "tags": [],
+    "metadata": {}
+  },
+
+  {
+    "type": "domain",
+    "value": "",
+    "status": "active",
+    "source": "scan",
+    "tags": [],
+    "metadata": {}
+  },
+
+  {
+    "type": "certificate",
+    "value": "CN=api.example.com",
+    "source": "scan",
+    "tags": [],
+    "metadata": {}
+  },
+
+  {
+    "type": "subdomain",
+    "status": "active",
+    "source": "scan",
+    "tags": [],
+    "metadata": {}
+  },
+
+  {
+    "type": "domain",
+    "value": "new-company.com",
+    "status": "active",
+    "source": "import",
+    "tags": ["new"],
+    "metadata": {
+      "owner": "Security Team"
+    }
+  }
+]
+-------------------------
+output:
+
+{
+    "summary": {
+        "imported": 0,
+        "updated": 6,
+        "skipped": 4,
+        "total": 10
+    },
+    "errors": [
+        {
+            "index": 5,
+            "asset": {
+                "type": "database",
+                "value": "mysql",
+                "status": "active",
+                "source": "scan",
+                "tags": [],
+                "metadata": {}
+            },
+            "reason": [
+                {
+                    "type": "enum",
+                    "loc": [
+                        "type"
+                    ],
+                    "msg": "Input should be 'domain', 'subdomain', 'ip_address', 'service', 'certificate' or 'technology'",
+                    "input": "database",
+                    "ctx": {
+                        "expected": "'domain', 'subdomain', 'ip_address', 'service', 'certificate' or 'technology'"
+                    },
+                    "url": "https://errors.pydantic.dev/2.13/v/enum"
+                }
+            ]
+        },
+        {
+            "index": 6,
+            "asset": {
+                "type": "domain",
+                "value": "",
+                "status": "active",
+                "source": "scan",
+                "tags": [],
+                "metadata": {}
+            },
+            "reason": [
+                {
+                    "type": "string_too_short",
+                    "loc": [
+                        "value"
+                    ],
+                    "msg": "String should have at least 1 character",
+                    "input": "",
+                    "ctx": {
+                        "min_length": 1
+                    },
+                    "url": "https://errors.pydantic.dev/2.13/v/string_too_short"
+                }
+            ]
+        },
+        {
+            "index": 7,
+            "asset": {
+                "type": "certificate",
+                "value": "CN=api.example.com",
+                "source": "scan",
+                "tags": [],
+                "metadata": {}
+            },
+            "reason": [
+                {
+                    "type": "missing",
+                    "loc": [
+                        "status"
+                    ],
+                    "msg": "Field required",
+                    "input": {
+                        "type": "certificate",
+                        "value": "CN=api.example.com",
+                        "source": "scan",
+                        "tags": [],
+                        "metadata": {}
+                    },
+                    "url": "https://errors.pydantic.dev/2.13/v/missing"
+                }
+            ]
+        },
+        {
+            "index": 8,
+            "asset": {
+                "type": "subdomain",
+                "status": "active",
+                "source": "scan",
+                "tags": [],
+                "metadata": {}
+            },
+            "reason": [
+                {
+                    "type": "missing",
+                    "loc": [
+                        "value"
+                    ],
+                    "msg": "Field required",
+                    "input": {
+                        "type": "subdomain",
+                        "status": "active",
+                        "source": "scan",
+                        "tags": [],
+                        "metadata": {}
+                    },
+                    "url": "https://errors.pydantic.dev/2.13/v/missing"
+                }
+            ]
+        }
+    ]
+}
+
+===============================================================================
+Feature 1:
+============================================================
+input:
+{
+    "question": "Show all expired certificate assets"
+}
+----------------------------
+output:
+{
+    "question": {
+        "question": "Show all expired certificate assets"
+    },
+    "generated_sql": "SELECT id, type, value, status, first_seen, last_seen, source, tags, metadata_json FROM assets WHERE type = 'certificate' AND (metadata_json->>'expires')::timestamp < NOW() LIMIT 20",
+    "rows": [
+        {
+            "id": "50a150ba-0093-4189-90e1-5dc5070b5fff",
+            "type": "certificate",
+            "value": "CN=legacy.example.com",
+            "status": "stale",
+            "first_seen": "2026-06-26T19:56:40.445596",
+            "last_seen": "2026-06-26T19:56:40.445596",
+            "source": "scan",
+            "tags": [
+                "expired"
+            ],
+            "metadata_json": {
+                "issuer": "Let's Encrypt",
+                "expires": "2026-05-10T00:00:00Z"
+            }
+        }
+    ]
+}
+==========================================================
+Feature 2:
+==========================================================================
+input:
+[
+    {
+  
+  "type": "subdomain",
+  "value": "old-api.example.com",
+  "status": "stale",
+  "source": "scan",
+  "tags": ["legacy"],
+  "metadata": {
+    "parent_domain": "example.com"
+  }
+}
+-------------------------------------------
+output:
+{
+    "results": [
+        {
+            "risk_score": 50,
+            "risk_level": "Medium",
+            "reasons": [
+                "Base score for type 'subdomain'",
+                "Status 'stale'",
+                "Last seen is null (implies > 90 days)"
+            ],
+            "summary": "The subdomain has a base risk due to its type, increased by its 'stale' status and the fact that it has not been seen recently, contributing to a medium risk level."
+        }
+    ]
+}
+
+================================================================
+Feature 3:
+==================================================================
+input:
+{
+  "type": "service",
+  "value": "https://api.payments.company.com",
+  "status": "active",
+  "source": "manual",
+  "tags": [],
+  "metadata": {}
+}
+-------------------------------
+output:
+{
+    "type": "service",
+    "value": "https://api.payments.company.com",
+    "status": "active",
+    "source": "manual",
+    "tags": [
+        "payments",
+        "api",
+        "production",
+        "service",
+        "critical"
+    ],
+    "metadata": {},
+    "environment": "Production",
+    "category": "API",
+    "criticality": "Critical",
+    "description": "Production API endpoint for processing company payments, classified as critical due to its direct involvement with financial transactions."
+}
+
+=================================================================================================================
+Feature 4:
+============================================================================
+input:
+{
+ "question": "write a report for active domain"
+}
+---------
+output:
+
+"## Cybersecurity Report: Active Domain Inventory\n\n**Date:** 2023-10-27 (Current Date)\n\n### 1. Executive Summary\n\nThis report provides an overview of currently active domains identified within the organization's asset inventory. A total of three (3) active domains were found. While an inventory of these domains is presented, specific risk findings could not be generated due to an error in processing the provided risk assessment data. Further investigation into the risk assessment system is recommended to ensure comprehensive security posture analysis.\n\n### 2. Inventory Summary\n\nThe following active domains have been identified:\n\n| Domain Name         | Status | First Seen                 | Last Seen                  | Source   | Tags                               | Metadata                                     |\n| :------------------ | :----- | :------------------------- | :------------------------- | :------- | :--------------------------------- | :------------------------------------------- |\n| `partner-company.com` | Active | 2026-06-26 19:47:20 UTC    | 2026-06-26 22:01:52 UTC    | manual   | partner                            | Owner: Security Team                         |\n| `example.com`       | Active | 2026-06-26 22:03:25 UTC    | 2026-06-28 17:09:17 UTC    | scan     | external, critical, production     | Registrar: Cloudflare, DNS: Cloudflare       |\n| `new-company.com`   | Active | 2026-06-28 17:05:49 UTC    | 2026-06-28 17:09:17 UTC    | Import   | new                                | Owner: Security Team                         |\n\n**Total Active Domains:** 3\n\n### 3. Key Risk Findings\n\nNo specific risk findings could be extracted for the identified active domains. The provided risk assessment data indicated an error (`'dict' object has no attribute 'model_dump'`) during processing, preventing the generation of a risk profile for each asset. Therefore, the current risk posture of these domains is undetermined based on the available assessment data.\n\n### 4. Recommendations\n\nBased on the current findings, the following recommendations are made:\n\n1.  **Investigate Risk Assessment Error:** Immediately investigate the root cause of the `'dict' object has no attribute 'model_dump'` error in the risk assessment system to ensure future assessments can be processed correctly.\n2.  **Conduct Manual Risk Review:** Until automated risk assessments are functional, perform a manual security review for each active domain, especially `example.com` which is tagged as 'critical' and 'production'.\n3.  **Regular Monitoring:** Implement continuous monitoring for all active domains to detect any unauthorized changes, suspicious activity, or potential vulnerabilities.\n4.  **Metadata Verification:** Review and verify the accuracy and completeness of metadata for each domain (e.g., owner, registrar, DNS provider) to ensure proper accountability and management."
