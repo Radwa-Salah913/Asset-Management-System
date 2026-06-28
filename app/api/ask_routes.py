@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from app.services.NL_asset_query import sqlGenerator 
-from app.schemas.question import AskRequest
+from app.services.asset_returner import sqlGenerator 
+from app.schemas.ask_request import AskRequest
+
 router = APIRouter()
 generator = sqlGenerator()
 
