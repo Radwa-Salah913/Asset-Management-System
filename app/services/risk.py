@@ -1,17 +1,23 @@
 import os
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 import json
 from app.schemas.risk_asset import AssetRisk
+from app.schemas.risk_response import RiskResponse
+
 class RiskScoring:
     
     def __init__(self):
         load_dotenv()
-        self.GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature = 0.0, google_api_key = self.GOOGLE_API_KEY)
-        self.parser = JsonOutputParser()
+
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError("GOOGLE_API_KEY not found.")
+        
+        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature = 0.0, google_api_key = api_key)
+        self.parser = PydanticOutputParser(pydantic_object=RiskResponse)
         self.prompt = PromptTemplate(
             input_variables=["asset_json"],
             partial_variables={ "format_instructions": self.parser.get_format_instructions() },
@@ -69,14 +75,15 @@ class RiskScoring:
                 TASK:
 
                 1) Calculate the total risk score.
-                2) Cap the score at 100.
-                3) Assign risk level:
+                2) Score cannot exceed 100.
+                3) Score cannot be below 0.
+                4) Assign risk level:
                 - 0–20: Low
                 - 21–50: Medium
                 - 51–80: High
                 - 81–100: Critical
 
-                4) Return output in JSON format ONLY:
+                5) Return output in JSON format ONLY:
                 {{
                 "risk_score": number,
                 "risk_level": "...",
@@ -93,13 +100,11 @@ class RiskScoring:
         self.chain = self.prompt | self.llm | self.parser
 
 
-    def _validate_output(self, result: dict) -> dict: 
-     
-        if not isinstance(result, dict): 
-            raise ValueError("Invalid output format") 
+    def _validate_output(self, result: RiskResponse) -> RiskResponse: 
+    
         
-        score = result.get("risk_score") 
-        level = result.get("risk_level") 
+        score = result.risk_score
+        level = result.risk_level
 
         if not isinstance(score, (int, float)): 
             raise ValueError("Invalid risk_score") 
@@ -110,6 +115,12 @@ class RiskScoring:
         valid_levels = ["Low", "Medium", "High", "Critical"] 
         if level not in valid_levels: 
             raise ValueError("Invalid risk_level") 
+        
+        if not isinstance(result.reasons, list):
+            raise ValueError("Reasons must be a list.")
+
+        if not isinstance(result.summary, str):
+            raise ValueError("Summary must be string.")
         
         return result 
     

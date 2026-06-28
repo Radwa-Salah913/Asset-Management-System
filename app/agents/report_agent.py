@@ -1,4 +1,4 @@
-from app.services.asset_returner import sqlGenerator
+from app.services.asset_returner import AssetsReturner
 from app.services.risk import RiskScoring
 from app.services.report_generator import ReportGenerator
 from app.schemas.ask_request import AskRequest
@@ -7,7 +7,7 @@ class ReportAgent:
 
     def __init__(self):
 
-        self.query = sqlGenerator()
+        self.query = AssetsReturner()
         self.risk = RiskScoring()
         self.report = ReportGenerator()
 

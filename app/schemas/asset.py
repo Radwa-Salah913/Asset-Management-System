@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import List, Dict, Any
 from app.database.models import AssetType, AssetStatus, AssetSource
 from datetime import datetime
@@ -7,7 +7,7 @@ from uuid import UUID
 class AssetImport(BaseModel):
     
     type: AssetType
-    value: str
+    value: str = Field(..., min_length=1)
     status: AssetStatus
     source: AssetSource
     tags: List[str] = []
@@ -17,7 +17,7 @@ class AssetImport(BaseModel):
 class AssetResponse(BaseModel):
     id: UUID
     type: AssetType
-    value: str
+    value: str = Field(..., min_length=1)
     first_seen: datetime
     last_seen: datetime
     status: AssetStatus
