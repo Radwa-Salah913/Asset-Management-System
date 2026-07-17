@@ -22,16 +22,15 @@ This project is a FastAPI-based asset management platform for storing, importing
 
 ## Project Structure
 
-The application follows a modular structure:
+The application follows a layered structure:
 
-- app/main.py: FastAPI application entry point
-- app/api/: HTTP route handlers for import, asset, ask, risk, enrichment, and report features
-- app/agents/: AI orchestration modules used by reporting and other intelligent workflows
-- app/database/: SQLAlchemy models, database connection, and schema helpers
-- app/schemas/: Pydantic request and response schemas
-- app/services/: Core business logic for import, enrichment, risk scoring, reporting, and asset retrieval
-- app/utils/: Shared utilities such as the rule engine
-
+- main.py: FastAPI application entry point
+- routes/api/: HTTP route handlers for import, asset, ask, risk, enrichment, and report features
+- controllers/agents/: AI orchestration modules used by reporting and other intelligent workflows
+- controllers/services/: Core business logic for import, enrichment, risk scoring, reporting, and asset retrieval
+- models/schemas/: Pydantic request and response schemas
+- models/utils/: Shared utilities such as the rule engine
+- db/database/: SQLAlchemy models, database connection, and schema helpers
 ## Prerequisites
 
 Before running the project, make sure you have:
@@ -50,11 +49,6 @@ From the project root, run:
 docker compose up -d
 ```
 
-To stop it later:
-
-```bash
-docker compose down
-```
 
 The database will be available at:
 
@@ -102,7 +96,7 @@ python create_tables.py
 Start the API server with:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 Once running, the interactive documentation is available at:
