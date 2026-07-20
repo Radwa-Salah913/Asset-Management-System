@@ -14,4 +14,5 @@ def get_db():
 
 @router.get("/get_assets")
 async def get_assets(db:Session = Depends(get_db)):
-    return db.query(Asset).all()
+    ans = await db.query(Asset).all()
+    return ans

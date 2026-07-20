@@ -9,7 +9,8 @@ enricher = Enrichment()
 async def enrich_asset(asset : EnrichAsset):
     
     try:
-        return enricher.enrich_asset(asset)
+        ans = await enricher.enrich_asset(asset)
+        return ans
 
     except Exception as e:
 

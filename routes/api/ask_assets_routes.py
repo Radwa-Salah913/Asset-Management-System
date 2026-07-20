@@ -7,5 +7,6 @@ generator = AssetsReturner()
 
 @router.post("/ask")
 async def ask_ai(question : AskRequest):
-    return generator.run_query(question)
+    ans = await generator.run_query(question)
+    return ans
 

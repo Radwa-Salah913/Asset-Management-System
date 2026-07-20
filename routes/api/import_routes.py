@@ -17,5 +17,5 @@ def get_db():
 # I used List[Dict[str, Any]] instead of AssetImport --> bec. I will validate in service file to handle Malformed import.
 @router.post("/import", response_model= BatchImportResponse)
 async def import_assets(assets: List[Dict[str, Any]], db:Session=Depends(get_db)):
-    results = import_assets_batch(db, assets)
+    results = await import_assets_batch(db, assets)
     return results

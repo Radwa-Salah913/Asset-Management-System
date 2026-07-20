@@ -7,5 +7,6 @@ generator = ReportAgent()
 
 @router.post("/report")
 async def ask_ai(question : AskRequest):
-    return generator.run(question)
+    ans = await generator.run(question)
+    return ans
 
